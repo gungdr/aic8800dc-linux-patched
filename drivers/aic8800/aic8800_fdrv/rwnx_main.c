@@ -2873,9 +2873,12 @@ static struct rwnx_vif *rwnx_interface_add(struct rwnx_hw *rwnx_hw,
 #endif
 
 
-    if (register_netdevice(ndev))
-        goto err;
-
+   #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0)
+       if (cfg80211_register_netdevice(ndev))
+   #else
+       if (register_netdevice(ndev))
+   #endif
+           goto err;
     spin_lock_bh(&rwnx_hw->cb_lock);
     list_add_tail(&vif->list, &rwnx_hw->vifs);
     spin_unlock_bh(&rwnx_hw->cb_lock);
